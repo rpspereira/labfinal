@@ -2,8 +2,8 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-// Usa as credenciais dos outputs do Terraform
-$host = '10.0.1.4'; // Será o IP privado da VM MySQL
+// Configuração da base de dados
+$host = '10.0.1.4'; // IP privado da VM MySQL (ajusta se for diferente)
 $user = 'frutaria_user';
 $pass = 'frutaria_pass';
 $db   = 'frutaria';
@@ -18,7 +18,8 @@ if (isset($_POST['add'])) {
     $nome = $conn->real_escape_string($_POST['nome']);
     $quantidade = intval($_POST['quantidade']);
     $preco = floatval($_POST['preco']);
-    $conn->query("INSERT INTO frutas (nome, quantidade, preco) VALUES ('$nome', $quantidade, $preco)");
+    $observacoes = $conn->real_escape_string($_POST['observacoes'] ?? '');
+    $conn->query("INSERT INTO frutas (nome, quantidade, preco, observacoes) VALUES ('$nome', $quantidade, $preco, '$observacoes')");
     header("Location: " . $_SERVER['PHP_SELF']);
     exit;
 }
@@ -36,7 +37,8 @@ if (isset($_POST['update'])) {
     $id = intval($_POST['id']);
     $quantidade = intval($_POST['quantidade']);
     $preco = floatval($_POST['preco']);
-    $conn->query("UPDATE frutas SET quantidade=$quantidade, preco=$preco WHERE id=$id");
+    $observacoes = $conn->real_escape_string($_POST['observacoes'] ?? '');
+    $conn->query("UPDATE frutas SET quantidade=$quantidade, preco=$preco, observacoes='$observacoes' WHERE id=$id");
     header("Location: " . $_SERVER['PHP_SELF']);
     exit;
 }
@@ -59,7 +61,8 @@ $result = $conn->query("SELECT * FROM frutas ORDER BY nome ASC");
         th { background: #3498db; color: white; }
         tr:nth-child(even) { background-color: #f2f2f2; }
         .add-form { background: #ecf0f1; padding: 20px; border-radius: 5px; margin-bottom: 30px; }
-        input[type="text"], input[type="number"] { padding: 8px; margin: 5px; border: 1px solid #ccc; border-radius: 4px; }
+        input[type="text"], input[type="number"], textarea { padding: 8px; margin: 5px; border: 1px solid #ccc; border-radius: 4px; }
+        textarea { resize: vertical; }
         button { padding: 10px 15px; margin: 5px; cursor: pointer; background: #3498db; color: white; border: none; border-radius: 4px; }
         button:hover { background: #2980b9; }
         .remove-btn { background: #e74c3c; color: white; text-decoration: none; padding: 5px 10px; border-radius: 3px; }
@@ -78,6 +81,7 @@ $result = $conn->query("SELECT * FROM frutas ORDER BY nome ASC");
                 <input type="text" name="nome" placeholder="Nome da fruta" required>
                 <input type="number" name="quantidade" placeholder="Quantidade" min="0" required>
                 <input type="number" step="0.01" name="preco" placeholder="Preço (€)" min="0" required>
+                <textarea name="observacoes" placeholder="Observações" rows="2" cols="30"></textarea>
                 <button type="submit" name="add">Adicionar Fruta</button>
             </form>
         </div>
@@ -90,6 +94,7 @@ $result = $conn->query("SELECT * FROM frutas ORDER BY nome ASC");
                     <th>🍏 Fruta</th>
                     <th>📦 Quantidade</th>
                     <th>💰 Preço (€)</th>
+                    <th>📝 Observações</th>
                     <th>⚙️ Ações</th>
                 </tr>
             </thead>
@@ -107,6 +112,9 @@ $result = $conn->query("SELECT * FROM frutas ORDER BY nome ASC");
                                 <input type="number" step="0.01" name="preco" value="<?= $fruta['preco'] ?>" min="0" required style="width: 80px;">
                             </td>
                             <td>
+                                <textarea name="observacoes" rows="2" cols="30"><?= htmlspecialchars($fruta['observacoes']) ?></textarea>
+                            </td>
+                            <td>
                                 <input type="hidden" name="id" value="<?= $fruta['id'] ?>">
                                 <button type="submit" name="update" class="update-btn">✏️ Atualizar</button>
                                 <a href="?remover=<?= $fruta['id'] ?>" class="remove-btn" onclick="return confirm('Remover <?= htmlspecialchars($fruta['nome']) ?>?')">🗑️ Remover</a>
@@ -115,7 +123,7 @@ $result = $conn->query("SELECT * FROM frutas ORDER BY nome ASC");
                     </tr>
                     <?php endwhile; ?>
                 <?php else: ?>
-                    <tr><td colspan="5">Nenhuma fruta encontrada no inventário.</td></tr>
+                    <tr><td colspan="6">Nenhuma fruta encontrada no inventário.</td></tr>
                 <?php endif; ?>
             </tbody>
         </table>
