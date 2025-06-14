@@ -147,7 +147,7 @@ $result = $conn->query("SELECT * FROM frutas ORDER BY nome ASC");
 </head>
 <body>
     <div class="container">
-        <h1>🍎 Loja de Conveniência de Frutas</h1>
+        <h1>🍎 Frutaria João Inácio 🍎 </h1>
         
         <div class="add-form">
             <h2>➕ Adicionar Nova Fruta</h2>
