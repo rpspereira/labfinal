@@ -3,7 +3,7 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 // Configuração da base de dados
-$host = '10.0.1.4'; // IP privado da VM MySQL (ajusta se for diferente)
+$host = '10.0.1.4'; // IP será atribuído automaticamente pelo Terraform
 $user = 'frutaria_user';
 $pass = 'frutaria_pass';
 $db   = 'frutaria';
@@ -54,21 +54,22 @@ $result = $conn->query("SELECT * FROM frutas ORDER BY nome ASC");
     <title>🍎 Loja de Conveniência de Frutas</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 40px; background-color: #f5f5f5; }
-        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h1 { color: #2c3e50; text-align: center; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; text-align: center; margin-bottom: 30px; }
         table { border-collapse: collapse; width: 100%; margin-top: 20px; }
         th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
         th { background: #3498db; color: white; }
-        tr:nth-child(even) { background-color: #f2f2f2; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
         .add-form { background: #ecf0f1; padding: 20px; border-radius: 5px; margin-bottom: 30px; }
-        input[type="text"], input[type="number"], textarea { padding: 8px; margin: 5px; border: 1px solid #ccc; border-radius: 4px; }
-        textarea { resize: vertical; }
+        input[type="text"], input[type="number"], textarea { padding: 8px; margin: 5px; border: 1px solid #ccc; border-radius: 4px; width: 150px; }
+        textarea { resize: vertical; height: 60px; width: 200px; }
         button { padding: 10px 15px; margin: 5px; cursor: pointer; background: #3498db; color: white; border: none; border-radius: 4px; }
         button:hover { background: #2980b9; }
-        .remove-btn { background: #e74c3c; color: white; text-decoration: none; padding: 5px 10px; border-radius: 3px; }
+        .remove-btn { background: #e74c3c; color: white; text-decoration: none; padding: 5px 10px; border-radius: 3px; margin-left: 5px; }
         .remove-btn:hover { background: #c0392b; }
         .update-btn { background: #27ae60; }
         .update-btn:hover { background: #229954; }
+        .status { text-align: center; margin-top: 30px; color: #7f8c8d; font-style: italic; }
     </style>
 </head>
 <body>
@@ -81,7 +82,8 @@ $result = $conn->query("SELECT * FROM frutas ORDER BY nome ASC");
                 <input type="text" name="nome" placeholder="Nome da fruta" required>
                 <input type="number" name="quantidade" placeholder="Quantidade" min="0" required>
                 <input type="number" step="0.01" name="preco" placeholder="Preço (€)" min="0" required>
-                <textarea name="observacoes" placeholder="Observações" rows="2" cols="30"></textarea>
+                <textarea name="observacoes" placeholder="Observações (opcional)"></textarea>
+                <br>
                 <button type="submit" name="add">Adicionar Fruta</button>
             </form>
         </div>
@@ -109,10 +111,10 @@ $result = $conn->query("SELECT * FROM frutas ORDER BY nome ASC");
                                 <input type="number" name="quantidade" value="<?= $fruta['quantidade'] ?>" min="0" required style="width: 70px;">
                             </td>
                             <td>
-                                <input type="number" step="0.01" name="preco" value="<?= $fruta['preco'] ?>" min="0" required style="width: 80px;">
+                                <input type="number" step="0.01" name="preco" value="<?= number_format($fruta['preco'], 2) ?>" min="0" required style="width: 80px;">
                             </td>
                             <td>
-                                <textarea name="observacoes" rows="2" cols="30"><?= htmlspecialchars($fruta['observacoes']) ?></textarea>
+                                <textarea name="observacoes" style="width: 150px; height: 40px;"><?= htmlspecialchars($fruta['observacoes']) ?></textarea>
                             </td>
                             <td>
                                 <input type="hidden" name="id" value="<?= $fruta['id'] ?>">
@@ -128,7 +130,11 @@ $result = $conn->query("SELECT * FROM frutas ORDER BY nome ASC");
             </tbody>
         </table>
         
-        <p style="text-align: center; margin-top: 30px; color: #7f8c8d;"><em>✅ Base de dados configurada automaticamente via Terraform!</em></p>
+        <div class="status">
+            <p>✅ Base de dados configurada automaticamente via Terraform!</p>
+            <p>✏️ Projeto Realizado pro 8094 - Rui Pereira 2025</p>
+            <p>🔄 Atualização automática ativa a partir do GitHub</p>
+        </div>
     </div>
 </body>
 </html>
