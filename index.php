@@ -3,7 +3,7 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 // Configuração da base de dados
-$host = '10.0.1.4'; // IP será atribuído automaticamente pelo Terraform
+$host = '10.0.1.4'; // IP privado da VM MySQL
 $user = 'frutaria_user';
 $pass = 'frutaria_pass';
 $db   = 'frutaria';
@@ -18,8 +18,8 @@ if (isset($_POST['add'])) {
     $nome = $conn->real_escape_string($_POST['nome']);
     $quantidade = intval($_POST['quantidade']);
     $preco = floatval($_POST['preco']);
-    $observacoes = $conn->real_escape_string($_POST['observacoes'] ?? '');
-    $conn->query("INSERT INTO frutas (nome, quantidade, preco, observacoes) VALUES ('$nome', $quantidade, $preco, '$observacoes')");
+    $obs = $conn->real_escape_string($_POST['obs'] ?? '');
+    $conn->query("INSERT INTO frutas (nome, quantidade, preco, obs) VALUES ('$nome', $quantidade, $preco, '$obs')");
     header("Location: " . $_SERVER['PHP_SELF']);
     exit;
 }
@@ -37,8 +37,8 @@ if (isset($_POST['update'])) {
     $id = intval($_POST['id']);
     $quantidade = intval($_POST['quantidade']);
     $preco = floatval($_POST['preco']);
-    $observacoes = $conn->real_escape_string($_POST['observacoes'] ?? '');
-    $conn->query("UPDATE frutas SET quantidade=$quantidade, preco=$preco, observacoes='$observacoes' WHERE id=$id");
+    $obs = $conn->real_escape_string($_POST['obs'] ?? '');
+    $conn->query("UPDATE frutas SET quantidade=$quantidade, preco=$preco, obs='$obs' WHERE id=$id");
     header("Location: " . $_SERVER['PHP_SELF']);
     exit;
 }
@@ -69,7 +69,6 @@ $result = $conn->query("SELECT * FROM frutas ORDER BY nome ASC");
         .remove-btn:hover { background: #c0392b; }
         .update-btn { background: #27ae60; }
         .update-btn:hover { background: #229954; }
-        .status { text-align: center; margin-top: 30px; color: #7f8c8d; font-style: italic; }
     </style>
 </head>
 <body>
@@ -82,7 +81,7 @@ $result = $conn->query("SELECT * FROM frutas ORDER BY nome ASC");
                 <input type="text" name="nome" placeholder="Nome da fruta" required>
                 <input type="number" name="quantidade" placeholder="Quantidade" min="0" required>
                 <input type="number" step="0.01" name="preco" placeholder="Preço (€)" min="0" required>
-                <textarea name="observacoes" placeholder="Observações (opcional)"></textarea>
+                <textarea name="obs" placeholder="Observações"></textarea>
                 <br>
                 <button type="submit" name="add">Adicionar Fruta</button>
             </form>
@@ -114,7 +113,7 @@ $result = $conn->query("SELECT * FROM frutas ORDER BY nome ASC");
                                 <input type="number" step="0.01" name="preco" value="<?= number_format($fruta['preco'], 2) ?>" min="0" required style="width: 80px;">
                             </td>
                             <td>
-                                <textarea name="observacoes" style="width: 150px; height: 40px;"><?= htmlspecialchars($fruta['observacoes']) ?></textarea>
+                                <textarea name="obs" style="width: 150px; height: 40px;"><?= htmlspecialchars($fruta['obs']) ?></textarea>
                             </td>
                             <td>
                                 <input type="hidden" name="id" value="<?= $fruta['id'] ?>">
@@ -130,10 +129,8 @@ $result = $conn->query("SELECT * FROM frutas ORDER BY nome ASC");
             </tbody>
         </table>
         
-        <div class="status">
-            <p>✅ Base de dados configurada automaticamente via Terraform!</p>
-            <p>✏️ Projeto Realizado pro 8094 - Rui Pereira 2025</p>
-            <p>🔄 Atualização automática ativa a partir do GitHub</p>
+        <div style="text-align: center; margin-top: 30px; color: #7f8c8d; font-style: italic;">
+            <p>✅ Sistema funcionando corretamente!</p>
         </div>
     </div>
 </body>
